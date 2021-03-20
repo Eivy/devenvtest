@@ -1,0 +1,14 @@
+version: '3'
+services:
+  db:
+    image: postgres:12
+    env_file: .env
+  api:
+    build: .
+    volumes:
+    - $PWD:/go/src/aptitude_bulb
+    working_dir: /go/src/aptitude_bulb
+    command: ["go", "run", "."]
+    ports:
+    - "8080:8080"
+    env_file: .env
