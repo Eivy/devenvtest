@@ -13,13 +13,15 @@ INSERT INTO items (
 	id,
 	name,
 	location,
+	counts,
 	manager_id
 )
 SELECT
 	CASE WHEN MAX(id) IS NULL THEN 0 ELSE MAX(id) + 1 END as id,
 	$1 as name,
 	$2 as location,
-	$3 as manager_id
+	$3 as counts,
+	$4 as manager_id
 FROM items
 RETURNING id, name, location, counts, manager_id
 `
@@ -27,11 +29,17 @@ RETURNING id, name, location, counts, manager_id
 type CreateItemParams struct {
 	Name      string
 	Location  sql.NullString
+	Counts    int32
 	ManagerID int32
 }
 
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
-	row := q.db.QueryRowContext(ctx, createItem, arg.Name, arg.Location, arg.ManagerID)
+	row := q.db.QueryRowContext(ctx, createItem,
+		arg.Name,
+		arg.Location,
+		arg.Counts,
+		arg.ManagerID,
+	)
 	var i Item
 	err := row.Scan(
 		&i.ID,

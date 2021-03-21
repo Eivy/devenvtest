@@ -6,12 +6,14 @@ type Item struct {
 	ID       int     `json:"id"`
 	Name     string  `json:"name"`
 	Location *string `json:"location"`
+	Counts   int     `json:"counts"`
 	Manager  *User   `json:"manager"`
 }
 
 type NewItem struct {
 	Name     string `json:"name"`
 	Location string `json:"location"`
+	Counts   int    `json:"counts"`
 	Manager  int    `json:"manager"`
 }
 

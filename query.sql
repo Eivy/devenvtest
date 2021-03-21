@@ -45,12 +45,14 @@ INSERT INTO items (
 	id,
 	name,
 	location,
+	counts,
 	manager_id
 )
 SELECT
 	CASE WHEN MAX(id) IS NULL THEN 0 ELSE MAX(id) + 1 END as id,
 	$1 as name,
 	$2 as location,
-	$3 as manager_id
+	$3 as counts,
+	$4 as manager_id
 FROM items
 RETURNING *;

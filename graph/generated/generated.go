@@ -44,6 +44,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Item struct {
+		Counts   func(childComplexity int) int
 		ID       func(childComplexity int) int
 		Location func(childComplexity int) int
 		Manager  func(childComplexity int) int
@@ -93,6 +94,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Item.counts":
+		if e.complexity.Item.Counts == nil {
+			break
+		}
+
+		return e.complexity.Item.Counts(childComplexity), true
 
 	case "Item.id":
 		if e.complexity.Item.ID == nil {
@@ -275,6 +283,7 @@ type Item {
   id: Int!
   name: String!
   location: String
+  counts: Int!
   manager: User!
 }
 
@@ -292,6 +301,7 @@ input NewUser {
 input NewItem {
   name: String!
   location: String!
+  counts: Int!
   manager: Int!
 }
 
@@ -520,6 +530,41 @@ func (ec *executionContext) _Item_location(ctx context.Context, field graphql.Co
 	res := resTmp.(*string)
 	fc.Result = res
 	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Item_counts(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "Item",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Counts, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Item_manager(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
@@ -2045,6 +2090,14 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 			if err != nil {
 				return it, err
 			}
+		case "counts":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("counts"))
+			it.Counts, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "manager":
 			var err error
 
@@ -2110,6 +2163,11 @@ func (ec *executionContext) _Item(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "location":
 			out.Values[i] = ec._Item_location(ctx, field, obj)
+		case "counts":
+			out.Values[i] = ec._Item_counts(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		case "manager":
 			out.Values[i] = ec._Item_manager(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

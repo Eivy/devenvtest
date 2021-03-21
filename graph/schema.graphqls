@@ -11,6 +11,7 @@ type Item {
   id: Int!
   name: String!
   location: String
+  counts: Int!
   manager: User!
 }
 
@@ -28,6 +29,7 @@ input NewUser {
 input NewItem {
   name: String!
   location: String!
+  counts: Int!
   manager: Int!
 }
 

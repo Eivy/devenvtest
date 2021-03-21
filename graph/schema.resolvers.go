@@ -21,13 +21,13 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 		ID:   int(u.ID),
 		Name: u.Name,
 	}, nil
-
 }
 
 func (r *mutationResolver) CreateItem(ctx context.Context, input model.NewItem) (*model.Item, error) {
 	item, err := con.CreateItem(ctx, db.CreateItemParams{
 		Name:      input.Name,
 		Location:  sql.NullString{String: input.Location},
+		Counts:    int32(input.Counts),
 		ManagerID: int32(input.Manager),
 	})
 	if err != nil {
@@ -38,8 +38,46 @@ func (r *mutationResolver) CreateItem(ctx context.Context, input model.NewItem) 
 		return nil, err
 	}
 	val := &model.Item{
-		ID:   int(item.ID),
-		Name: item.Name,
+		ID:     int(item.ID),
+		Name:   item.Name,
+		Counts: int(item.Counts),
+		Manager: &model.User{
+			ID:   int(u.ID),
+			Name: u.Name,
+		},
+	}
+	if item.Location.Valid {
+		val.Location = &item.Location.String
+	} else {
+		val.Location = nil
+	}
+	return val, nil
+}
+
+func (r *mutationResolver) DeleteUser(ctx context.Context, id int) (*model.User, error) {
+	u, err := con.DeleteUser(ctx, int32(id))
+	if err != nil {
+		return nil, err
+	}
+	return &model.User{
+		ID:   int(u.ID),
+		Name: u.Name,
+	}, nil
+}
+
+func (r *mutationResolver) DeleteItem(ctx context.Context, id int) (*model.Item, error) {
+	item, err := con.DeleteItem(ctx, int32(id))
+	if err != nil {
+		return nil, err
+	}
+	u, err := con.GetUser(ctx, item.ManagerID)
+	if err != nil {
+		return nil, err
+	}
+	val := &model.Item{
+		ID:     int(item.ID),
+		Name:   item.Name,
+		Counts: int(item.Counts),
 		Manager: &model.User{
 			ID:   int(u.ID),
 			Name: u.Name,
@@ -97,7 +135,7 @@ func (r *queryResolver) Items(ctx context.Context) ([]*model.Item, error) {
 		if v.Location.Valid {
 			items[i].Location = &v.Location.String
 		} else {
-			items[i] = nil
+			items[i].Location = nil
 		}
 	}
 	return items, nil
@@ -109,7 +147,9 @@ func (r *queryResolver) Item(ctx context.Context, id int) (*model.Item, error) {
 		return nil, err
 	}
 	val := &model.Item{
-		ID: int(item.ID),
+		ID:     int(item.ID),
+		Name:   item.Name,
+		Counts: int(item.Counts),
 		Manager: &model.User{
 			ID:   int(item.ID_2),
 			Name: item.Name_2,
