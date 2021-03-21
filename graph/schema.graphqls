@@ -3,12 +3,12 @@
 # https://gqlgen.com/getting-started/
 
 type User {
-  id: ID!
+  id: Int!
   name: String!
 }
 
 type Item {
-  id: ID!
+  id: Int!
   name: String!
   location: String
   manager: User!
@@ -16,9 +16,9 @@ type Item {
 
 type Query {
   users: [User!]!
-  user(id: ID!): User!
+  user(id: Int!): User!
   items: [Item!]!
-  item(id: ID!): Item!
+  item(id: Int!): Item!
 }
 
 input NewUser {
@@ -28,7 +28,7 @@ input NewUser {
 input NewItem {
   name: String!
   location: String!
-  manager: ID!
+  manager: Int!
 }
 
 type Mutation {
