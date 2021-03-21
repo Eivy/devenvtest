@@ -11,11 +11,27 @@ import (
 	"github.com/eivy/aptitude_bulb/graph/model"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+func (r *mutationResolver) CreateItem(ctx context.Context, input model.NewItem) (*model.Item, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Items(ctx context.Context) ([]*model.Item, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Item(ctx context.Context, id string) (*model.Item, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
