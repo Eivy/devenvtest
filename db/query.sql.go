@@ -70,6 +70,38 @@ func (q *Queries) CreateUser(ctx context.Context, name string) (User, error) {
 	return i, err
 }
 
+const deleteItem = `-- name: DeleteItem :one
+DELETE FROM items
+WHERE id = $1
+RETURNING id, name, location, counts, manager_id
+`
+
+func (q *Queries) DeleteItem(ctx context.Context, id int32) (Item, error) {
+	row := q.db.QueryRowContext(ctx, deleteItem, id)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Location,
+		&i.Counts,
+		&i.ManagerID,
+	)
+	return i, err
+}
+
+const deleteUser = `-- name: DeleteUser :one
+DELETE FROM users
+WHERE id = $1
+RETURNING id, name
+`
+
+func (q *Queries) DeleteUser(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRowContext(ctx, deleteUser, id)
+	var i User
+	err := row.Scan(&i.ID, &i.Name)
+	return i, err
+}
+
 const getItem = `-- name: GetItem :one
 SELECT items.id, items.name, location, counts, manager_id, users.id, users.name FROM items
 LEFT JOIN users

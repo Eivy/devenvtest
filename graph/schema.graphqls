@@ -36,4 +36,6 @@ input NewItem {
 type Mutation {
   createUser(input: NewUser!): User!
   createItem(input: NewItem!): Item!
+  deleteUser(id: Int!): User!
+  deleteItem(id: Int!): Item!
 }
