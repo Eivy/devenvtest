@@ -20,6 +20,11 @@ func main() {
 		port = defaultPort
 	}
 
+	err := graph.New()
+	if err != nil {
+		panic(err)
+	}
+
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))

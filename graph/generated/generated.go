@@ -56,9 +56,9 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Item  func(childComplexity int, id string) int
+		Item  func(childComplexity int, id int) int
 		Items func(childComplexity int) int
-		User  func(childComplexity int, id string) int
+		User  func(childComplexity int, id int) int
 		Users func(childComplexity int) int
 	}
 
@@ -74,9 +74,9 @@ type MutationResolver interface {
 }
 type QueryResolver interface {
 	Users(ctx context.Context) ([]*model.User, error)
-	User(ctx context.Context, id string) (*model.User, error)
+	User(ctx context.Context, id int) (*model.User, error)
 	Items(ctx context.Context) ([]*model.Item, error)
-	Item(ctx context.Context, id string) (*model.Item, error)
+	Item(ctx context.Context, id int) (*model.Item, error)
 }
 
 type executableSchema struct {
@@ -156,7 +156,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.Item(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.Item(childComplexity, args["id"].(int)), true
 
 	case "Query.items":
 		if e.complexity.Query.Items == nil {
@@ -175,7 +175,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.User(childComplexity, args["id"].(string)), true
+		return e.complexity.Query.User(childComplexity, args["id"].(int)), true
 
 	case "Query.users":
 		if e.complexity.Query.Users == nil {
@@ -267,12 +267,12 @@ var sources = []*ast.Source{
 # https://gqlgen.com/getting-started/
 
 type User {
-  id: ID!
+  id: Int!
   name: String!
 }
 
 type Item {
-  id: ID!
+  id: Int!
   name: String!
   location: String
   manager: User!
@@ -280,9 +280,9 @@ type Item {
 
 type Query {
   users: [User!]!
-  user(id: ID!): User!
+  user(id: Int!): User!
   items: [Item!]!
-  item(id: ID!): Item!
+  item(id: Int!): Item!
 }
 
 input NewUser {
@@ -292,7 +292,7 @@ input NewUser {
 input NewItem {
   name: String!
   location: String!
-  manager: ID!
+  manager: Int!
 }
 
 type Mutation {
@@ -355,10 +355,10 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_item_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 int
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -370,10 +370,10 @@ func (ec *executionContext) field_Query_item_args(ctx context.Context, rawArgs m
 func (ec *executionContext) field_Query_user_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 string
+	var arg0 int
 	if tmp, ok := rawArgs["id"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-		arg0, err = ec.unmarshalNID2string(ctx, tmp)
+		arg0, err = ec.unmarshalNInt2int(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -450,9 +450,9 @@ func (ec *executionContext) _Item_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Item_name(ctx context.Context, field graphql.CollectedField, obj *model.Item) (ret graphql.Marshaler) {
@@ -701,7 +701,7 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().User(rctx, args["id"].(string))
+		return ec.resolvers.Query().User(rctx, args["id"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -778,7 +778,7 @@ func (ec *executionContext) _Query_item(ctx context.Context, field graphql.Colle
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Item(rctx, args["id"].(string))
+		return ec.resolvers.Query().Item(rctx, args["id"].(int))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -896,9 +896,9 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(int)
 	fc.Result = res
-	return ec.marshalNID2string(ctx, field.Selections, res)
+	return ec.marshalNInt2int(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
@@ -2049,7 +2049,7 @@ func (ec *executionContext) unmarshalInputNewItem(ctx context.Context, obj inter
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("manager"))
-			it.Manager, err = ec.unmarshalNID2string(ctx, v)
+			it.Manager, err = ec.unmarshalNInt2int(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -2540,13 +2540,13 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNID2string(ctx context.Context, v interface{}) (string, error) {
-	res, err := graphql.UnmarshalID(v)
+func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v interface{}) (int, error) {
+	res, err := graphql.UnmarshalInt(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
-	res := graphql.MarshalID(v)
+func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.SelectionSet, v int) graphql.Marshaler {
+	res := graphql.MarshalInt(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "must not be null")

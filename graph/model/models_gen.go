@@ -3,7 +3,7 @@
 package model
 
 type Item struct {
-	ID       string  `json:"id"`
+	ID       int     `json:"id"`
 	Name     string  `json:"name"`
 	Location *string `json:"location"`
 	Manager  *User   `json:"manager"`
@@ -12,7 +12,7 @@ type Item struct {
 type NewItem struct {
 	Name     string `json:"name"`
 	Location string `json:"location"`
-	Manager  string `json:"manager"`
+	Manager  int    `json:"manager"`
 }
 
 type NewUser struct {
@@ -20,6 +20,6 @@ type NewUser struct {
 }
 
 type User struct {
-	ID   string `json:"id"`
+	ID   int    `json:"id"`
 	Name string `json:"name"`
 }
