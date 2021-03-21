@@ -1,5 +1,4 @@
 CREATE TABLE users (
-	id text primary key,
-	name text,
-	group_id text
+	id int NOT NULL primary key,
+	name text NOT NULL
 );

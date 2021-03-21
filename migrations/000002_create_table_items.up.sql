@@ -1,7 +1,7 @@
 CREATE TABLE items (
-	id text primary key,
-	name text,
-	location text,
-	counts int,
-	manager_id text
+	id INT NOT NULL primary key,
+	name TEXT NOT NULL,
+	location TEXT,
+	counts INT NOT NULL,
+	manager_id INT NOT NULL
 );
